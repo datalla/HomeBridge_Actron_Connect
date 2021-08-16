@@ -4,7 +4,6 @@ import json
 import sys
 
 # Please note that this is still early code and I have not implemented any error handling or coding best practices. Feel free to improve on your own branch :) 
-
 app = Flask(__name__)
 
 # URL's 

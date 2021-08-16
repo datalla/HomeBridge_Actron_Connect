@@ -1,0 +1,49 @@
+This is an work in progress plugin for homebridge to control the WiFi module of the ActronAir AC Unit for Connect, can also be modified to work with Que systems also.
+
+If you wish to use this plugin please go through the code AC-Webhook_Git.py as it will indicate what changes you need to make for your system and how to get started. 
+
+
+The code leverages most of the information below, however if you wish to tinker or build on your own the information below is there for you to use :) 
+
+Random Information that may be useful if building your own plugin:
+
+`ACCESS_TOKEN` refers to tokens retrieved through the OAuth2 process.
+`USER_ACCESS_TOKEN` refers to the token generated within the Ninja dashboard
+
+Web based controller:
+https://actronair.com.au/aconnect/#/Auth
+https://actronair.com.au/aconnect/#/Control
+
+AdhocUrls: (Change IP to your local Actron connect controller)            
+http://192.168.1.115/identity.json
+http://192.168.1.115/4.json
+http://192.168.1.115/6.json
+
+Send Control Messages using this API:
+https://que.actronair.com.au/api/v0/device/ACONNECTXXXXXX?user_access_token=XXXXXXXXX
+
+payload for the requests will look like this: {DA:{amOn: false, tempTarget: 24, fanSpeed: 2, mode: 1, enabledZones: [1,1,0,0,0,0,0,0]}}
+You can get more information about what options your particular unit may have by using the 6.json api call to your system.
+
+Actron Connect setting modes:
+* Zone control and status
+* Mode Selection and status
+    * 0 = Auto
+    * 1 = Heat
+    * 2 = Cool
+    * 3 = Fan
+* Fan Speed Selection and status
+    * 0 = Low
+    * 1 = Med
+    * 2 = High
+* Compressor Activity - This is just information
+    * 0 = Heating
+    * 1 = Cooling
+    * 2 = Off
+
+ AirconTypes:          [
+        {name: 'Standard Classic', id: 0},
+        {name: 'ESP Plus', id: 1},
+        {name: 'ESP Ultima', id: 2},
+        {name: 'Platinum Plus', id: 3},
+        {name: 'Platinum Ultima', id: 4}

@@ -153,7 +153,7 @@ def Get_Status():
 			status_update_list['targetHeatingCoolingState']  = "0"
 			status_update_list['currentHeatingCoolingState'] = "0"
 		else:
-			return("Error here")
+			return("Error no valid state")
 	else:
 		print("Failed_loop_error 404")
 

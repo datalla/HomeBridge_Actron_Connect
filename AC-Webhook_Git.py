@@ -132,25 +132,79 @@ def Get_Status():
 		"http_method": "GET",
 	}
 	"""
-	if status_data['mode'] == 1:
+	if str(status_data['isOn']) == 'False':
 		status_update_list['currentHeatingCoolingState'] = 0
 		status_update_list['currentTemperature'] = status_data['roomTemp_oC']
 		status_update_list['targetHeatingCoolingState'] = 0
 		status_update_list['targetTemperature'] = status_data['setPoint']
-	else:
-		if status_data['mode'] == "0":
-			status_update_list['mode'] = "3"
-		elif status_data['mode'] == "1":
-			status_update_list['mode'] = "1"
-		elif status_data['mode'] == "2":
-			status_update_list['mode'] = "2"
-		elif status_data['mode'] == "3":
-			status_update_list['mode'] = "0"
+	elif str(status_data['isOn']) == 'True':
+		status_update_list['currentTemperature'] = status_data['roomTemp_oC']
+		status_update_list['targetTemperature'] = status_data['setPoint']
+		if int(status_data['mode']) == 0:
+			status_update_list['targetHeatingCoolingState']  = "3"
+			status_update_list['currentHeatingCoolingState'] = "3"
+		elif int(status_data['mode']) == 1:
+			status_update_list['targetHeatingCoolingState']  = "1"
+			status_update_list['currentHeatingCoolingState'] = "1"
+		elif int(status_data['mode']) == 2:
+			status_update_list['targetHeatingCoolingState']  = "2"
+			status_update_list['currentHeatingCoolingState'] = "2"
+		elif int(status_data['mode']) == 3:
+			status_update_list['targetHeatingCoolingState']  = "0"
+			status_update_list['currentHeatingCoolingState'] = "0"
 		else:
-			return("Error")
-	return(status_update_list)
+			return("Error here")
+	else:
+		print("Failed_loop_error 404")
 
+	print(status_update_list)
+@app.route('/zone_state', methods=['GET'])
+def zone_state():
+	response = requests.get('http://10.30.0.98/6.json')
+	status_data = json.loads(response.content)
+	zone = request.args.get('zone')
+	print(zone)
+	if zone == "upstairs":
+		zone_state = status_data['enabledZones'][0]
+	elif zone == "downstairs":
+		zone_state = status_data['enabledZones'][1]
+	else:
+		return('404')
+	
+	if zone_state == 0:
+		return('0')
+	elif zone_state == 1:
+		return('1')
+	else:
+		return('404')
 
+@app.route('/zone', methods=['GET'])
+def zone():
+	response = requests.get('http://10.30.0.98/6.json')
+	status_data = json.loads(response.content)
+	zone = request.args.get('zone')
+	zone_state = request.args.get('state')
+	print(zone)
+	print(zone_state)
+	if zone == "upstairs":
+		Downstairs_Zone_State = status_data['enabledZones'][1]
+		if zone_state == 'on':
+			Upstairs_Zone_State = '1'
+		elif zone_state == 'off':
+			Upstairs_Zone_State = '0'
+	elif zone == "downstairs":
+		Upstairs_Zone_State = status_data['enabledZones'][0]
+		if zone_state == 'on':
+			Downstairs_Zone_State = '1'
+		elif zone_state == 'off':
+			Downstairs_Zone_State = '0'
+	else:
+		return('404 fff')
+
+	payload = ("{DA:{enabledZones: [%s,%s,0,0,0,0,0,0]}}"%(Upstairs_Zone_State,Downstairs_Zone_State))
+	print(payload)
+	Actron_Set(payload)
+	return('200')
 
 @app.route('/status', methods=['GET'])
 def status():
